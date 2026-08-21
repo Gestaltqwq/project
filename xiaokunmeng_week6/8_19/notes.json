@@ -1,0 +1,49 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "anti_collision_bucket"
+    },
+    {
+      "id": 1,
+      "name": "bridge_bearing"
+    },
+    {
+      "id": 2,
+      "name": "fire_box"
+    },
+    {
+      "id": 3,
+      "name": "lane_sign"
+    },
+    {
+      "id": 4,
+      "name": "led_screen"
+    },
+    {
+      "id": 5,
+      "name": "parking"
+    },
+    {
+      "id": 6,
+      "name": "roadside_plant"
+    },
+    {
+      "id": 7,
+      "name": "toll_booth"
+    },
+    {
+      "id": 8,
+      "name": "tunnel_entrance"
+    },
+    {
+      "id": 9,
+      "name": "warning_sign"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}

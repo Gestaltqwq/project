@@ -1,0 +1,15 @@
+path: D:/code/2026/7_8月实训/project/xiaokunmeng_week6/8_19/eval_holdout_set
+train: images/val
+val: images/val
+nc: 10
+names:
+  0: anti_collision_bucket
+  1: bridge_bearing
+  2: fire_box
+  3: lane_sign
+  4: led_screen
+  5: parking
+  6: roadside_plant
+  7: toll_booth
+  8: tunnel_entrance
+  9: warning_sign

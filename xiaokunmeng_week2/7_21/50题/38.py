@@ -1,0 +1,1 @@
+print(len(input("输入字符串：")))

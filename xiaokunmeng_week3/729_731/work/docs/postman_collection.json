@@ -1,0 +1,978 @@
+{
+  "info": {
+    "name": "保险精准营销系统",
+    "description": "基于 03_API接口文档.md 的 29 个接口",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01-认证",
+      "item": [
+        {
+          "name": "登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"admin\", \"password\": \"admin123\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"admin_token\", pm.response.json().data.access_token);",
+                  "pm.test(\"登录成功\", () => pm.response.json().code === 0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"student01\", \"password\": \"stu123456\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"user_token\", pm.response.json().data.access_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取当前用户",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "登出",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "用户列表（管理员）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "users"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02-数据",
+      "item": [
+        {
+          "name": "上传 Excel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "data/sample_customers.xlsx"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/data/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data",
+                "upload"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "客户列表分页",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/data/customers?page=1&per_page=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data",
+                "customers?page=1&per_page=20"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "数据概览统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/data/statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data",
+                "statistics"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "数据质量报告",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/data/quality",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data",
+                "quality"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "EDA 可视化",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/data/visualization/response_distribution",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data",
+                "visualization",
+                "response_distribution"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03-模型",
+      "item": [
+        {
+          "name": "训练模型",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/train",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "train"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"models\": [\"xgboost\"]}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "实验记录分页",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/experiments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "experiments"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "获取最佳模型",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/best",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "best"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "全量预测",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/predict",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "predict"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "上传数据预测",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "data/sample_customers.xlsx"
+                },
+                {
+                  "key": "model",
+                  "type": "text",
+                  "value": "xgboost"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/model/predict_upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "predict_upload"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "模型可视化-ROC",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/visualization/roc_curve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "visualization",
+                "roc_curve"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "模型可视化-指标对比",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/visualization/metrics_comparison",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "visualization",
+                "metrics_comparison"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "模型可视化-混淆矩阵",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/visualization/confusion_matrix?model=xgboost",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "visualization",
+                "confusion_matrix?model=xgboost"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "模型可视化-特征重要性",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/visualization/feature_importance?model=xgboost",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "visualization",
+                "feature_importance?model=xgboost"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "导出模型",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/model/export/xgboost",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "export",
+                "xgboost"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "导入模型",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "data/models/xgboost.joblib"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/model/import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "model",
+                "import"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04-邮件",
+      "item": [
+        {
+          "name": "高潜客户筛选",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/targets?percentile=0.9",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "targets?percentile=0.9"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "生成营销邮件",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/generate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "generate"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"limit\": 5}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取 Prompt 模板",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/prompt",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "prompt"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "更新 Prompt 模板",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/prompt",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "prompt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\": \"你是保险营销文案专家。请根据客户画像{gender}/{age}生成邮件。仅返回严格JSON：{{\\\"subject\\\":\\\"主题\\\",\\\"content\\\":\\\"正文\\\"}}\"}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "邮件记录列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records?page=1&per_page=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records?page=1&per_page=20"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "邮件详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "更新邮件记录",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records",
+                "1"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email_subject\": \"新标题\"}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "标记邮件状态",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records",
+                "1"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\": \"sent\"}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除单条邮件",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "批量删除邮件",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/records",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "email",
+                "records"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"record_ids\": [1, 2, 3]}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05-日志",
+      "item": [
+        {
+          "name": "操作日志查询",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logs?page=1&per_page=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logs?page=1&per_page=20"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

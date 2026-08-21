@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容管理系统</title>
+<style>
+  /* ========== Reset & Base ========== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
+  }
+  a { color: #1890ff; text-decoration: none; }
+  a:hover { color: #40a9ff; }
+
+  /* ========== Layout ========== */
+  .app-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header .logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .app-header .logo small { font-size: 13px; font-weight: 400; opacity: .65; }
+  .app-header nav { display: flex; align-items: center; gap: 6px; }
+  .app-header nav button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    padding: 7px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all .2s;
+  }
+  .app-header nav button:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.5); }
+  .app-header nav button.active { background: #1890ff; border-color: #1890ff; }
+  .app-header .user-area { display: flex; align-items: center; gap: 12px; }
+  .app-header .user-area .user-badge {
+    background: rgba(255,255,255,.12);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .app-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ========== Page sections ========== */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #1890ff;
+    display: inline-block;
+  }
+
+  /* ========== Cards ========== */
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: box-shadow .2s;
+  }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+
+  /* ========== Company Hero ========== */
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(24,144,255,.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero h1 { font-size: 36px; font-weight: 800; margin-bottom: 8px; position: relative; z-index: 1; }
+  .hero .slogan { font-size: 18px; opacity: .85; margin-bottom: 16px; position: relative; z-index: 1; }
+  .hero .company-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    font-size: 14px; opacity: .75;
+    position: relative; z-index: 1;
+  }
+  .hero .company-meta span { display: flex; align-items: center; gap: 6px; }
+  .hero .desc {
+    margin-top: 20px;
+    line-height: 1.8;
+    opacity: .9;
+    position: relative; z-index: 1;
+  }
+
+  /* ========== News List ========== */
+  .news-list .news-item {
+    cursor: pointer;
+    transition: all .2s;
+    border-left: 3px solid transparent;
+  }
+  .news-list .news-item:hover { border-left-color: #1890ff; transform: translateX(4px); }
+  .news-item .news-meta {
+    display: flex; gap: 12px; align-items: center;
+    font-size: 13px; color: #999; margin-bottom: 6px;
+  }
+  .news-item .news-meta .tag {
+    background: #e6f7ff; color: #1890ff;
+    padding: 0 8px; border-radius: 4px;
+    font-size: 12px; line-height: 22px;
+  }
+  .news-item h3 { font-size: 17px; margin-bottom: 6px; }
+  .news-item p { color: #666; font-size: 14px; line-height: 1.6; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+  /* ========== News Detail ========== */
+  .news-detail-header { margin-bottom: 16px; }
+  .news-detail-header h2 { font-size: 26px; margin-bottom: 10px; }
+  .news-detail-header .meta { color: #999; font-size: 14px; display: flex; gap: 16px; }
+  .news-detail-body { line-height: 1.9; font-size: 15px; color: #444; white-space: pre-wrap; }
+  .btn-back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    background: none;
+    border: none;
+    padding: 4px 0;
+  }
+  .btn-back:hover { color: #1890ff; }
+
+  /* ========== Login ========== */
+  .login-wrapper {
+    max-width: 400px;
+    margin: 60px auto;
+  }
+  .login-wrapper .card { padding: 36px; }
+  .login-wrapper h2 { text-align: center; margin-bottom: 28px; font-size: 22px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #555; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border .2s;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+  }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+
+  /* ========== Buttons ========== */
+  .btn {
+    border: none;
+    padding: 9px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .2s;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { background: #1890ff; color: #fff; }
+  .btn-primary:hover { background: #40a9ff; }
+  .btn-danger { background: #ff4d4f; color: #fff; }
+  .btn-danger:hover { background: #ff7875; }
+  .btn-default { background: #f5f5f5; color: #333; border: 1px solid #d9d9d9; }
+  .btn-default:hover { background: #e8e8e8; }
+  .btn-sm { padding: 5px 14px; font-size: 13px; }
+  .btn-block { width: 100%; justify-content: center; padding: 11px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ========== Admin Dashboard ========== */
+  .admin-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 768px) { .admin-layout { grid-template-columns: 1fr; } }
+
+  .admin-news-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .admin-news-item:last-child { border-bottom: none; }
+  .admin-news-item .info { flex: 1; min-width: 0; cursor: pointer; }
+  .admin-news-item .info h4 { font-size: 15px; margin-bottom: 4px; }
+  .admin-news-item .info .meta { font-size: 12px; color: #999; }
+  .admin-news-item .actions { flex-shrink: 0; margin-left: 12px; }
+
+  .admin-list-scroll { max-height: 500px; overflow-y: auto; }
+  .admin-list-scroll::-webkit-scrollbar { width: 6px; }
+  .admin-list-scroll::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+
+  /* ========== Toast ========== */
+  .toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    animation: slideIn .3s ease;
+    max-width: 360px;
+  }
+  .toast-success { background: #52c41a; }
+  .toast-error { background: #ff4d4f; }
+  .toast-info { background: #1890ff; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* ========== Loading ========== */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 14px;
+  }
+  .loading::after {
+    content: '';
+    display: block;
+    width: 28px; height: 28px;
+    margin: 12px auto;
+    border: 3px solid #e8e8e8;
+    border-top-color: #1890ff;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state { text-align: center; padding: 40px; color: #bbb; font-size: 15px; }
+
+  /* ========== Responsive ========== */
+  @media (max-width: 640px) {
+    .app-header { padding: 0 16px; }
+    .app-header .logo span { display: none; }
+    .hero { padding: 32px 20px; }
+    .hero h1 { font-size: 26px; }
+    .admin-layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="app-header">
+  <div class="logo" onclick="showPage('home')">
+    <small>CMS</small>
+  </div>
+  <nav>
+    <button class="active" onclick="showPage('home')" data-page="home">🏠 首页</button>
+    <button onclick="showPage('news')" data-page="news">📰 新闻</button>
+    <button onclick="showPage('login')" id="nav-login" data-page="login">🔑 登录</button>
+    <button onclick="showPage('admin')" id="nav-admin" data-page="admin" style="display:none">⚙️ 管理</button>
+    <button onclick="logout()" id="nav-logout" style="display:none">🚪 退出</button>
+  </nav>
+  <div class="user-area" id="userArea" style="display:none">
+    <span class="user-badge" id="userBadge"></span>
+  </div>
+</header>
+
+<!-- ========== TOAST ========== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-container">
+
+<!-- ===== PAGE: HOME ===== -->
+<div class="page active" id="page-home">
+  <div id="heroArea">
+    <div class="loading">加载公司信息...</div>
+  </div>
+  <h2 class="section-title">📌 最新动态</h2>
+  <div class="news-list" id="homeNewsList">
+    <div class="loading">加载新闻...</div>
+  </div>
+</div>
+
+<!-- ===== PAGE: NEWS LIST ===== -->
+<div class="page" id="page-news">
+  <h2 class="section-title">📰 全部新闻</h2>
+  <div id="newsFilter" style="margin-bottom:16px;">
+    <input type="text" id="newsSearchInput" placeholder="🔍 搜索新闻标题..." style="width:100%;max-width:360px;padding:9px 14px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;" oninput="filterNewsList()">
+  </div>
+  <div class="news-list" id="newsList">
+    <div class="loading">加载新闻...</div>
+  </div>
+  <div id="newsEmpty" class="empty-state" style="display:none">暂无新闻</div>
+</div>
+
+<!-- ===== PAGE: NEWS DETAIL ===== -->
+<div class="page" id="page-news-detail">
+  <button class="btn-back" onclick="showPage('news')">← 返回新闻列表</button>
+  <div class="card" id="newsDetailContent">
+    <div class="loading">加载新闻详情...</div>
+  </div>
+</div>
+
+<!-- ===== PAGE: LOGIN ===== -->
+<div class="page" id="page-login">
+  <div class="login-wrapper">
+    <!-- 登录 -->
+    <div class="card" id="loginCard">
+      <h2>🔐 登录</h2>
+      <form onsubmit="login(event)">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="loginUsername" placeholder="请输入用户名" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">登 录</button>
+      </form>
+      <p style="text-align:center;margin-top:14px;font-size:13px;color:#999;">
+        没有账号？<a href="#" onclick="showRegister()" style="color:#1890ff;">立即注册</a>
+        &nbsp;|&nbsp; 预设管理员 admin / admin123
+      </p>
+    </div>
+
+    <!-- 注册 -->
+    <div class="card" id="registerCard" style="display:none;">
+      <h2>📝 注册新用户</h2>
+      <form onsubmit="register(event)">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="regUsername" placeholder="至少2个字符" required minlength="2">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="regPassword" placeholder="至少4个字符" required minlength="4">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="regBtn">注 册</button>
+      </form>
+      <p style="text-align:center;margin-top:14px;font-size:13px;color:#999;">
+        已有账号？<a href="#" onclick="showLogin()" style="color:#1890ff;">去登录</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: ADMIN ===== -->
+<div class="page" id="page-admin">
+  <h2 class="section-title">⚙️ 后台管理</h2>
+
+  <div class="admin-layout">
+    <!-- LEFT: Publish News -->
+    <div class="card">
+      <h3 style="margin-bottom:16px;">📝 发布新闻</h3>
+      <form onsubmit="publishNews(event)">
+        <div class="form-group">
+          <label>标题 <span style="color:#ff4d4f;">*</span></label>
+          <input type="text" id="newsTitle" placeholder="请输入新闻标题" required>
+        </div>
+        <div class="form-group">
+          <label>分类</label>
+          <select id="newsCategory">
+            <option value="默认">默认</option>
+            <option value="公司动态">公司动态</option>
+            <option value="行业资讯">行业资讯</option>
+            <option value="产品公告">产品公告</option>
+            <option value="技术分享">技术分享</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>内容 <span style="color:#ff4d4f;">*</span></label>
+          <textarea id="newsContent" placeholder="请输入新闻内容..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="publishBtn">发布新闻</button>
+      </form>
+    </div>
+
+    <!-- RIGHT: Manage News -->
+    <div class="card">
+      <h3 style="margin-bottom:16px;">📋 管理已有新闻</h3>
+      <div class="admin-list-scroll" id="adminNewsList">
+        <div class="loading">加载新闻列表...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app-container -->
+
+<script>
+// ============================================================
+//  CMS Frontend — Single Page Application
+// ============================================================
+
+const BASE = '';  // 同源访问，Flask 运行在 5006 端口
+
+// ---------- Utility ----------
+const $ = id => document.getElementById(id);
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  $('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(BASE + path, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...opts.headers },
+    ...opts,
+  });
+  const data = await res.json();
+  if (!res.ok && data.msg) toast(data.msg, 'error');
+  return data;
+}
+
+// ---------- Page Router ----------
+function showPage(name, param) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = $('page-' + name);
+  if (page) page.classList.add('active');
+
+  document.querySelectorAll('nav button[data-page]').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === name);
+  });
+
+  // Route
+  switch (name) {
+    case 'home': loadHome(); break;
+    case 'news': loadNewsList(); break;
+    case 'news-detail': loadNewsDetail(param); break;
+    case 'admin': loadAdminPanel(); break;
+  }
+}
+
+// ---------- Session / Auth ----------
+function updateAuthUI(user) {
+  const loginBtn = $('nav-login');
+  const adminBtn = $('nav-admin');
+  const logoutBtn = $('nav-logout');
+  const userArea = $('userArea');
+  const badge = $('userBadge');
+
+  if (user) {
+    loginBtn.style.display = 'none';
+    adminBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'inline-block';
+    userArea.style.display = 'flex';
+    badge.textContent = `👤 ${user.username} (${user.role})`;
+  } else {
+    loginBtn.style.display = 'inline-block';
+    adminBtn.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    userArea.style.display = 'none';
+    // if on admin page, redirect to home
+    if ($('page-admin').classList.contains('active')) showPage('home');
+  }
+}
+
+// Try session restore — check if we're still logged in
+async function checkSession() {
+  try {
+    const res = await fetch(BASE + '/api/news', { credentials: 'include' });
+    // We can't reliably detect session from GET /api/news (it doesn't require auth),
+    // so check via the raw response for the admin endpoints.
+    // Actually, let's just check if localStorage has user info.
+    const saved = localStorage.getItem('cms_user');
+    if (saved) {
+      const user = JSON.parse(saved);
+      updateAuthUI(user);
+    }
+  } catch (e) { /* ignore */ }
+}
+
+async function login(e) {
+  e.preventDefault();
+  const btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = '登录中...';
+
+  const data = await api('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: $('loginUsername').value,
+      password: $('loginPassword').value,
+    }),
+  });
+
+  btn.disabled = false; btn.textContent = '登 录';
+
+  if (data.code === 200) {
+    toast('登录成功！', 'success');
+    localStorage.setItem('cms_user', JSON.stringify(data.data));
+    updateAuthUI(data.data);
+    showPage('admin');
+    // Clear form
+    $('loginUsername').value = '';
+    $('loginPassword').value = '';
+  }
+}
+
+// ---------- Register ----------
+function showRegister() {
+  $('loginCard').style.display = 'none';
+  $('registerCard').style.display = 'block';
+}
+function showLogin() {
+  $('loginCard').style.display = 'block';
+  $('registerCard').style.display = 'none';
+}
+
+async function register(e) {
+  e.preventDefault();
+  const btn = $('regBtn');
+  btn.disabled = true; btn.textContent = '注册中...';
+
+  const data = await api('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: $('regUsername').value,
+      password: $('regPassword').value,
+    }),
+  });
+
+  btn.disabled = false; btn.textContent = '注 册';
+
+  if (data.code === 200 || data.code === 201) {
+    toast('注册成功！请登录', 'success');
+    $('regUsername').value = '';
+    $('regPassword').value = '';
+    showLogin();
+    $('loginUsername').value = data.data.username;
+  }
+}
+
+async function logout() {
+  await api('/auth/logout', { method: 'POST' });
+  localStorage.removeItem('cms_user');
+  updateAuthUI(null);
+  toast('已退出登录', 'info');
+  showPage('home');
+}
+
+// ---------- PAGE: Home ----------
+async function loadHome() {
+  const heroEl = $('heroArea');
+  const newsEl = $('homeNewsList');
+
+  try {
+    const data = await api('/');
+    if (data.code === 200) {
+      const c = data.data.company;
+      heroEl.innerHTML = `
+        <div class="hero">
+          <h1>${c.name}</h1>
+          <div class="slogan">${c.slogan}</div>
+          <div class="company-meta">
+            <span>📅 成立：${c.founded}</span>
+            <span>📍 地址：${c.location}</span>
+            <span>👥 团队：${c.employees} 人</span>
+          </div>
+          <div class="desc">${c.description}</div>
+        </div>
+      `;
+
+      const news = data.data.latest_news;
+      if (news && news.length) {
+        newsEl.innerHTML = news.map(n => renderNewsItem(n)).join('');
+      } else {
+        newsEl.innerHTML = '<div class="empty-state">暂无最新动态</div>';
+      }
+    }
+  } catch (e) {
+    heroEl.innerHTML = '<div class="card" style="color:#ff4d4f;text-align:center;padding:40px;">❌ 无法连接到服务器，请确认后端已启动</div>';
+    newsEl.innerHTML = '';
+  }
+}
+
+// ---------- PAGE: News List ----------
+let allNews = [];
+
+async function loadNewsList() {
+  const el = $('newsList');
+  el.innerHTML = '<div class="loading">加载新闻...</div>';
+  $('newsEmpty').style.display = 'none';
+
+  try {
+    const data = await api('/api/news');
+    if (data.code === 200) {
+      allNews = data.data || [];
+      renderNewsList(allNews);
+    }
+  } catch (e) {
+    el.innerHTML = '<div class="card" style="color:#ff4d4f;text-align:center;">❌ 加载失败</div>';
+  }
+}
+
+function renderNewsList(list) {
+  const el = $('newsList');
+  if (!list.length) {
+    el.innerHTML = '';
+    $('newsEmpty').style.display = 'block';
+    return;
+  }
+  $('newsEmpty').style.display = 'none';
+  el.innerHTML = list.map(n => renderNewsItem(n)).join('');
+}
+
+function filterNewsList() {
+  const q = $('newsSearchInput').value.trim().toLowerCase();
+  if (!q) return renderNewsList(allNews);
+  const filtered = allNews.filter(n => n.title.toLowerCase().includes(q));
+  renderNewsList(filtered);
+}
+
+function renderNewsItem(n) {
+  const date = n.created_at ? n.created_at.slice(0, 10) : '';
+  const excerpt = (n.content || '').replace(/<[^>]+>/g, '').slice(0, 120);
+  return `
+    <div class="card news-item" onclick="showPage('news-detail', ${n.id})">
+      <div class="news-meta">
+        <span>📅 ${date}</span>
+        <span class="tag">${n.category || '默认'}</span>
+      </div>
+      <h3>${n.title}</h3>
+      <p>${excerpt}${n.content && n.content.length > 120 ? '...' : ''}</p>
+    </div>
+  `;
+}
+
+// ---------- PAGE: News Detail ----------
+async function loadNewsDetail(id) {
+  const el = $('newsDetailContent');
+  el.innerHTML = '<div class="loading">加载新闻详情...</div>';
+
+  try {
+    const data = await api('/api/news/' + id);
+    if (data.code === 200) {
+      const n = data.data;
+      el.innerHTML = `
+        <div class="news-detail-header">
+          <h2>${n.title}</h2>
+          <div class="meta">
+            <span>📅 ${n.created_at || ''}</span>
+            <span class="tag" style="background:#e6f7ff;color:#1890ff;padding:0 8px;border-radius:4px;">${n.category || '默认'}</span>
+          </div>
+        </div>
+        <div class="news-detail-body">${n.content}</div>
+      `;
+    } else {
+      el.innerHTML = '<div class="empty-state">新闻不存在</div>';
+    }
+  } catch (e) {
+    el.innerHTML = '<div class="card" style="color:#ff4d4f;text-align:center;">❌ 加载失败</div>';
+  }
+}
+
+// ---------- PAGE: Admin ----------
+async function loadAdminPanel() {
+  const user = JSON.parse(localStorage.getItem('cms_user') || 'null');
+  if (!user || user.role !== 'admin') {
+    toast('请先以管理员身份登录', 'error');
+    showPage('login');
+    return;
+  }
+  const el = $('adminNewsList');
+  el.innerHTML = '<div class="loading">加载新闻列表...</div>';
+
+  try {
+    const data = await api('/api/news');
+    if (data.code === 200) {
+      const list = data.data || [];
+      if (!list.length) {
+        el.innerHTML = '<div class="empty-state">暂无新闻，去发布一篇吧！</div>';
+        return;
+      }
+      el.innerHTML = list.map(n => `
+        <div class="admin-news-item">
+          <div class="info" onclick="showPage('news-detail', ${n.id})">
+            <h4>${n.title}</h4>
+            <div class="meta">
+              ${n.created_at ? n.created_at.slice(0, 10) : ''} · ${n.category || '默认'}
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-danger btn-sm" onclick="deleteNews(${n.id})">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    el.innerHTML = '<div class="empty-state">加载失败</div>';
+  }
+}
+
+async function publishNews(e) {
+  e.preventDefault();
+  const btn = $('publishBtn');
+  btn.disabled = true; btn.textContent = '发布中...';
+
+  const data = await api('/admin/news', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: $('newsTitle').value,
+      content: $('newsContent').value,
+      category: $('newsCategory').value,
+    }),
+  });
+
+  btn.disabled = false; btn.textContent = '发布新闻';
+
+  if (data.code === 200 || data.code === 201) {
+    toast('新闻发布成功！', 'success');
+    // Clear form
+    $('newsTitle').value = '';
+    $('newsContent').value = '';
+    $('newsCategory').value = '默认';
+    // Refresh admin list
+    loadAdminPanel();
+    // Also refresh news list data
+    const newsData = await api('/api/news');
+    if (newsData.code === 200) allNews = newsData.data || [];
+  }
+}
+
+async function deleteNews(id) {
+  if (!confirm('确认要删除这篇新闻吗？此操作不可恢复。')) return;
+
+  const data = await api('/admin/news/' + id, { method: 'DELETE' });
+  if (data.code === 200) {
+    toast('删除成功', 'success');
+    loadAdminPanel();
+    // Refresh allNews
+    const newsData = await api('/api/news');
+    if (newsData.code === 200) allNews = newsData.data || [];
+  }
+}
+
+// ---------- Init ----------
+checkSession();
+loadHome();
+</script>
+</body>
+</html>

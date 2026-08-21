@@ -1,0 +1,1 @@
+print(input("请输入字符串：").count(input("请输入子串：")))

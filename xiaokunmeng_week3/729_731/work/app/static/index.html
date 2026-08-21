@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保险精准营销系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="bg-light">
+
+<!-- ===== 登录页 ===== -->
+<div id="login-page" class="login-wrap">
+    <div class="login-card card shadow">
+        <div class="login-brand text-center mb-4">
+            <div class="brand-seal" aria-hidden="true">核</div>
+            <div class="brand-name">保险精准营销系统</div>
+            <small>AI 驱动的智能营销平台</small>
+        </div>
+        <div class="mb-3"><input id="login-username" class="form-control" placeholder="用户名" autocomplete="username"></div>
+        <div class="mb-3"><input id="login-password" type="password" class="form-control" placeholder="密码" autocomplete="current-password"></div>
+        <div class="mb-3 d-none" id="login-confirm-wrap">
+            <input id="login-confirm" type="password" class="form-control" placeholder="确认密码" autocomplete="new-password">
+        </div>
+        <div id="login-error" class="alert alert-danger d-none small py-2"></div>
+        <button id="btn-login" class="btn btn-primary w-100">登 录</button>
+        <button id="btn-register" class="btn btn-outline-primary w-100 d-none">注 册</button>
+        <div class="text-center mt-3 small">
+            <a href="#" id="login-mode-toggle">没有账号？立即注册</a>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 主界面 ===== -->
+<div id="app-page" class="d-none">
+    <nav class="navbar app-navbar px-3">
+        <span class="navbar-brand d-flex align-items-center gap-2">
+            <span class="mini-seal" aria-hidden="true">核</span>保险精准营销系统
+        </span>
+        <div class="d-flex align-items-center text-white">
+            <span id="nav-user" class="me-3"></span>
+            <button id="btn-logout" class="btn btn-outline-light btn-sm">退出登录</button>
+        </div>
+    </nav>
+    <div class="d-flex">
+        <!-- 左侧菜单 -->
+        <aside id="sidebar" class="bg-white border-end">
+            <ul id="menu-list" class="nav flex-column"></ul>
+        </aside>
+        <!-- 右侧内容 -->
+        <main id="content" class="flex-grow-1 p-4">
+
+            <!-- ===== 仪表盘 ===== -->
+            <section class="view" id="view-dashboard">
+                <h5>仪表盘</h5>
+                <div id="dash-stats" class="row g-3 mb-4"></div>
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <div class="card h-100"><div class="card-body">
+                            <h6 class="card-title mb-3 d-flex justify-content-between align-items-center">
+                                <span>🎯 潜在用户</span>
+                                <span class="d-flex gap-1 align-items-center small fw-normal">
+                                    概率 &ge;
+                                    <input id="dash-min-prob" type="number" class="form-control form-control-sm w-auto"
+                                           value="0.7" min="0.5" max="1" step="0.05" style="width:70px">
+                                    <button id="btn-dash-filter" class="btn btn-sm btn-primary">筛选</button>
+                                </span>
+                            </h6>
+                            <div id="dash-target-count" class="small text-muted mb-2"></div>
+                            <table class="table table-sm table-hover">
+                                <thead><tr><th style="width:12%">排名</th><th style="width:18%">ID</th><th style="width:14%">性别</th><th style="width:14%">年龄</th><th style="width:22%">年保费</th><th style="width:20%">购买概率</th></tr></thead>
+                                <tbody id="dash-targets"></tbody>
+                            </table>
+                        </div></div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card h-100"><div class="card-body">
+                            <h6 class="card-title mb-3">快捷操作</h6>
+                            <div class="d-flex flex-column gap-2">
+                                <a class="btn btn-outline-primary quick-link" href="#/data">📤 上传客户数据</a>
+                                <a class="btn btn-outline-primary quick-link" href="#/model">🤖 训练模型</a>
+                                <a class="btn btn-outline-primary quick-link" href="#/predict">🎯 全量预测</a>
+                                <a class="btn btn-outline-primary quick-link" href="#/email">✉️ 生成营销邮件</a>
+                            </div>
+                            <hr>
+                            <h6 class="card-title mb-2">数据健康度</h6>
+                            <div id="dash-health" class="small"></div>
+                        </div></div>
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6" id="dash-experiment-card"><div class="card"><div class="card-body">
+                        <h6 class="card-title mb-2">最新实验</h6>
+                        <div id="dash-experiment" class="small"></div>
+                    </div></div></div>
+                </div>
+            </section>
+
+            <!-- ===== 数据管理（上传/统计/质量/客户）===== -->
+            <section class="view" id="view-data">
+                <h5>数据管理</h5>
+                <ul class="nav nav-pills sub-tabs mb-3">
+                    <li class="nav-item" id="sub-upload"><button class="nav-link active" data-sub="data-upload">数据上传</button></li>
+                    <li class="nav-item"><button class="nav-link" data-sub="data-stats">数据概览</button></li>
+                    <li class="nav-item"><button class="nav-link" data-sub="data-quality">质量报告</button></li>
+                    <li class="nav-item"><button class="nav-link" data-sub="data-customers">客户列表</button></li>
+                </ul>
+                <!-- 上传 -->
+                <div class="sub-pane" id="data-upload">
+                    <div class="card"><div class="card-body">
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="file" id="upload-file" class="form-control" accept=".xlsx">
+                            <button id="btn-upload" class="btn btn-primary">上传</button>
+                        </div>
+                        <div id="upload-msg" class="small mt-2 text-success"></div>
+                    </div></div>
+                </div>
+                <!-- 统计 -->
+                <div class="sub-pane d-none" id="data-stats"><div id="stats-box"></div></div>
+                <!-- 质量 -->
+                <div class="sub-pane d-none" id="data-quality"><div id="quality-box"></div></div>
+                <!-- 客户 -->
+                <div class="sub-pane d-none" id="data-customers">
+                    <div class="card"><div class="card-body">
+                        <div class="d-flex gap-2 mb-2">
+                            <input id="f-gender" class="form-control form-control-sm w-auto" placeholder="性别 Male/Female">
+                            <input id="f-age-min" type="number" class="form-control form-control-sm w-auto" placeholder="年龄下限">
+                            <button id="btn-filter" class="btn btn-sm btn-outline-secondary">筛选</button>
+                        </div>
+                        <table class="table table-sm table-hover">
+                            <thead><tr><th style="width:8%">ID</th><th style="width:10%">性别</th><th style="width:10%">年龄</th><th style="width:14%">车龄</th><th style="width:14%">是否损坏</th><th style="width:16%">年保费</th><th style="width:14%">购买概率</th><th style="width:14%">实际</th></tr></thead>
+                            <tbody id="customer-body"></tbody>
+                        </table>
+                        <div class="d-flex justify-content-between align-items-center small">
+                            <span id="customer-info"></span>
+                            <div><button id="page-prev" class="btn btn-sm btn-outline-secondary">上一页</button>
+                                  <button id="page-next" class="btn btn-sm btn-outline-secondary">下一页</button></div>
+                        </div>
+                    </div></div>
+                </div>
+            </section>
+
+            <!-- ===== 数据分析（EDA）===== -->
+            <section class="view" id="view-eda">
+                <h5>数据分析</h5>
+                <div class="d-flex gap-2 mb-3 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary eda-btn" data-ct="response_distribution">响应分布</button>
+                    <button class="btn btn-sm btn-outline-primary eda-btn" data-ct="gender_response">性别×响应</button>
+                    <button class="btn btn-sm btn-outline-primary eda-btn" data-ct="age_distribution">年龄分布</button>
+                    <button class="btn btn-sm btn-outline-primary eda-btn" data-ct="premium_distribution">保费分布</button>
+                </div>
+                <div id="eda-img" class="card shadow-sm p-3"></div>
+            </section>
+
+            <!-- ===== 模型中心（训练/实验/评估）===== -->
+            <section class="view" id="view-model">
+                <h5>模型中心</h5>
+                <ul class="nav nav-pills sub-tabs mb-3">
+                    <li class="nav-item"><button class="nav-link active" data-sub="model-train">模型训练</button></li>
+                    <li class="nav-item"><button class="nav-link" data-sub="model-exp">实验记录</button></li>
+                    <li class="nav-item"><button class="nav-link" data-sub="model-eval">模型评估</button></li>
+                </ul>
+                <div class="sub-pane" id="model-train">
+                    <div class="card"><div class="card-body">
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <select id="train-algo" class="form-select w-auto">
+                                <option value="all">全部算法</option>
+                                <option value="xgboost">XGBoost</option>
+                                <option value="logistic_regression">逻辑回归</option>
+                                <option value="random_forest">随机森林</option>
+                            </select>
+                            <button id="btn-train" class="btn btn-primary">开始训练</button>
+                            <button id="btn-predict" class="btn btn-success">全量预测</button>
+                        </div>
+                        <div id="train-msg" class="small mt-2 text-muted"></div>
+                        <div id="train-result" class="row mt-3"></div>
+
+                        <!-- 超参数设置 -->
+                        <hr class="my-3">
+                        <h6 class="card-title mb-3">超参数设置</h6>
+                        <div class="row g-3">
+                            <!-- 通用参数 -->
+                            <div class="col-md-3 col-6 hp-item" data-algo="all">
+                                <label class="form-label small fw-bold">训练集划分 (test_size)</label>
+                                <input id="train-test-size" type="number" class="form-control form-control-sm"
+                                       value="0.2" min="0.05" max="0.5" step="0.05">
+                                <div class="form-text">测试集占比，0.2 = 80%训练/20%测试</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="all">
+                                <label class="form-label small fw-bold">随机种子 (random_state)</label>
+                                <input id="hp-random-state" type="number" class="form-control form-control-sm" value="42" min="0">
+                                <div class="form-text">固定种子，训练结果可复现</div>
+                            </div>
+                            <!-- 树模型通用 -->
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost,random_forest">
+                                <label class="form-label small fw-bold">决策树数量 (n_estimators)</label>
+                                <input id="hp-n-estimators" type="number" class="form-control form-control-sm"
+                                       value="200" min="10" max="1000" step="10">
+                                <div class="form-text">弱学习器总棵树，越多拟合越强越慢</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost,random_forest">
+                                <label class="form-label small fw-bold">最大深度 (max_depth)</label>
+                                <input id="hp-max-depth" type="number" class="form-control form-control-sm"
+                                       value="6" min="1" max="12">
+                                <div class="form-text">单棵树深度，过大易过拟合</div>
+                            </div>
+                            <!-- XGBoost 专属 -->
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">学习率 (learning_rate)</label>
+                                <input id="hp-lr" type="number" class="form-control form-control-sm"
+                                       value="0.05" min="0.01" max="0.5" step="0.01">
+                                <div class="form-text">每棵树贡献权重，越小越稳需更多树</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">子采样 (subsample)</label>
+                                <input id="hp-subsample" type="number" class="form-control form-control-sm"
+                                       value="0.8" min="0.1" max="1" step="0.05">
+                                <div class="form-text">每轮用多少比例样本，防过拟合</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">列采样 (colsample_bytree)</label>
+                                <input id="hp-colsample-bytree" type="number" class="form-control form-control-sm"
+                                       value="0.8" min="0.1" max="1" step="0.05">
+                                <div class="form-text">每棵树用多少比例特征</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">叶最小权重 (min_child_weight)</label>
+                                <input id="hp-min-child-weight" type="number" class="form-control form-control-sm"
+                                       value="1" min="1" max="20">
+                                <div class="form-text">子节点最小样本权重和，越大越保守</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">Gamma</label>
+                                <input id="hp-gamma" type="number" class="form-control form-control-sm"
+                                       value="0" min="0" max="10" step="0.1">
+                                <div class="form-text">分裂最小损失减少量，越大越保守</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">L1 正则 (reg_alpha)</label>
+                                <input id="hp-reg-alpha" type="number" class="form-control form-control-sm"
+                                       value="0" min="0" max="10" step="0.1">
+                                <div class="form-text">L1 正则化强度，防过拟合</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="xgboost">
+                                <label class="form-label small fw-bold">L2 正则 (reg_lambda)</label>
+                                <input id="hp-reg-lambda" type="number" class="form-control form-control-sm"
+                                       value="1" min="0" max="10" step="0.1">
+                                <div class="form-text">L2 正则化强度，防过拟合</div>
+                            </div>
+                            <!-- 随机森林专属 -->
+                            <div class="col-md-3 col-6 hp-item" data-algo="random_forest">
+                                <label class="form-label small fw-bold">最小分裂样本 (min_samples_split)</label>
+                                <input id="hp-min-samples-split" type="number" class="form-control form-control-sm"
+                                       value="2" min="2" max="50">
+                                <div class="form-text">节点分裂所需最少样本，越大越保守</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="random_forest">
+                                <label class="form-label small fw-bold">叶最小样本 (min_samples_leaf)</label>
+                                <input id="hp-min-samples-leaf" type="number" class="form-control form-control-sm"
+                                       value="1" min="1" max="50">
+                                <div class="form-text">叶节点最少样本数，防过拟合</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="random_forest">
+                                <label class="form-label small fw-bold">最大特征数 (max_features)</label>
+                                <select id="hp-max-features" class="form-select form-select-sm">
+                                    <option value="sqrt" selected>sqrt（平方根，默认）</option>
+                                    <option value="auto">auto（全量）</option>
+                                    <option value="log2">log2</option>
+                                    <option value="None">None（无限制）</option>
+                                </select>
+                                <div class="form-text">每棵树随机选用的特征数策略</div>
+                            </div>
+                            <!-- 逻辑回归专属 -->
+                            <div class="col-md-3 col-6 hp-item" data-algo="logistic_regression">
+                                <label class="form-label small fw-bold">正则强度 (C)</label>
+                                <input id="hp-C" type="number" class="form-control form-control-sm"
+                                       value="1" min="0.01" max="100" step="0.1">
+                                <div class="form-text">正则化倒数，越小正则越强</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="logistic_regression">
+                                <label class="form-label small fw-bold">惩罚项 (penalty)</label>
+                                <select id="hp-penalty" class="form-select form-select-sm">
+                                    <option value="l2" selected>l2（L2 正则，默认）</option>
+                                    <option value="l1">l1（L1 正则）</option>
+                                    <option value="elasticnet">elasticnet（弹性网）</option>
+                                </select>
+                                <div class="form-text">正则化类型</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="logistic_regression">
+                                <label class="form-label small fw-bold">求解器 (solver)</label>
+                                <select id="hp-solver" class="form-select form-select-sm">
+                                    <option value="lbfgs" selected>lbfgs（默认）</option>
+                                    <option value="liblinear">liblinear</option>
+                                    <option value="newton-cg">newton-cg</option>
+                                    <option value="sag">sag</option>
+                                    <option value="saga">saga</option>
+                                </select>
+                                <div class="form-text">优化求解算法</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="logistic_regression">
+                                <label class="form-label small fw-bold">最大迭代 (max_iter)</label>
+                                <input id="hp-max-iter" type="number" class="form-control form-control-sm"
+                                       value="1000" min="100" max="5000" step="100">
+                                <div class="form-text">不收敛时可调大</div>
+                            </div>
+                            <div class="col-md-3 col-6 hp-item" data-algo="logistic_regression">
+                                <label class="form-label small fw-bold">容差 (tol)</label>
+                                <input id="hp-tol" type="number" class="form-control form-control-sm"
+                                       value="0.0001" min="0.000001" step="0.0001">
+                                <div class="form-text">收敛判定精度，越小迭代越久</div>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-2" id="hp-hint"></div>
+                    </div></div>
+                </div>
+                <div class="sub-pane d-none" id="model-exp">
+                    <div class="card"><div class="card-body">
+                        <div id="exp-body" class="p-0"></div>
+                    </div></div>
+                </div>
+                <div class="sub-pane d-none" id="model-eval">
+                    <div class="d-flex gap-2 mb-3 flex-wrap">
+                        <button class="btn btn-sm btn-outline-primary meval-btn" data-ct="roc_curve">ROC 曲线</button>
+                        <button class="btn btn-sm btn-outline-primary meval-btn" data-ct="metrics_comparison">指标对比</button>
+                        <button class="btn btn-sm btn-outline-primary meval-btn" data-ct="confusion_matrix" data-model="xgboost">混淆矩阵</button>
+                        <button class="btn btn-sm btn-outline-primary meval-btn" data-ct="feature_importance" data-model="xgboost">特征重要性</button>
+                    </div>
+                    <div id="meval-img" class="card shadow-sm p-3"></div>
+                </div>
+            </section>
+
+            <!-- ===== 智能预测 ===== -->
+            <section class="view" id="view-predict">
+                <h5>智能预测</h5>
+                <div class="card mb-3"><div class="card-body">
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="small text-muted">高潜筛选比例：</span>
+                        <input id="percentile" type="number" class="form-control form-control-sm w-auto" value="0.9" step="0.05" min="0.5" max="1">
+                        <button id="btn-targets" class="btn btn-sm btn-primary">筛选</button>
+                    </div>
+                    <div class="small mt-2 text-muted">先执行全量预测，再按概率分位筛选高潜客户（top 10%）</div>
+                </div></div>
+                <div class="card"><div class="card-body">
+                    <h6 class="card-title">高潜客户</h6>
+                    <table class="table table-sm table-hover">
+                        <thead><tr><th style="width:10%">排名</th><th style="width:20%">ID</th><th style="width:15%">性别</th><th style="width:15%">年龄</th><th style="width:20%">年保费</th><th style="width:20%">购买概率</th></tr></thead>
+                        <tbody id="target-body"></tbody>
+                    </table>
+                </div></div>
+            </section>
+
+            <!-- ===== 邮件营销 ===== -->
+            <section class="view" id="view-email">
+                <h5>邮件营销</h5>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="card h-100"><div class="card-body">
+                            <h6 class="card-title">生成营销邮件</h6>
+                            <div class="d-flex gap-2 align-items-center mb-3">
+                                <input id="email-limit" type="number" class="form-control w-auto" value="5" min="1" max="100">
+                                <button id="btn-generate" class="btn btn-primary">生成</button>
+                            </div>
+                            <hr>
+                            <h6 class="card-title">Prompt 模板</h6>
+                            <textarea id="prompt-content" class="form-control form-control-sm mb-2" rows="6"></textarea>
+                            <button id="btn-save-prompt" class="btn btn-sm btn-outline-secondary">保存模板</button>
+                        </div></div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card h-100"><div class="card-body">
+                            <h6 class="card-title">邮件记录</h6>
+                            <table class="table table-sm table-hover">
+                                <thead><tr><th style="width:8%">ID</th><th style="width:9%">客户</th><th style="width:38%">标题</th><th style="width:11%">状态</th><th style="width:24%">时间</th><th style="width:10%">操作</th></tr></thead>
+                                <tbody id="email-body"></tbody>
+                            </table>
+                        </div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== 操作日志（admin）===== -->
+            <section class="view" id="view-logs">
+                <h5>操作日志</h5>
+                <div class="card"><div class="card-body">
+                    <table class="table table-sm table-hover">
+                        <thead><tr><th style="width:8%">ID</th><th style="width:15%">用户</th><th style="width:20%">动作</th><th style="width:37%">详情</th><th style="width:20%">时间</th></tr></thead>
+                        <tbody id="log-body"></tbody>
+                    </table>
+                </div></div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- ===== 邮件详情弹窗 ===== -->
+<div class="modal fade" id="email-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="email-modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="email-content-frame" sandbox class="email-content-frame" title="邮件内容"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

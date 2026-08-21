@@ -1,0 +1,48 @@
+# ============ 环境变量（含密钥，绝不提交） ============
+.env
+*.env
+
+# ============ Python ============
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ============ 模型训练副产物（可重新生成，不推送） ============
+runs/
+**/runs/
+checkpoint-*/
+**/checkpoint-*/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.onnx
+*.engine
+optimizer.pt
+
+# TensorBoard / 日志
+tensorboard/
+logs/
+*.log
+
+# ============ 训练数据集（大文件，不推送） ============
+yelp_*.json
+*.parquet
+*.arrow
+**/yolo_dataset*/
+**/yolo_dataset_*/
+data/wikiann*/
+datasets/
+# 大于 100MB 的原始数据请自行确认
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# ============ IDE / 系统 ============
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

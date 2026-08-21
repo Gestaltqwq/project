@@ -1,0 +1,10 @@
+anti_collision_bucket
+bridge_bearing
+fire_box
+lane_sign
+led_screen
+parking
+roadside_plant
+toll_booth
+tunnel_entrance
+warning_sign

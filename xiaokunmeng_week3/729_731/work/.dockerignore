@@ -1,0 +1,13 @@
+# 不入镜像
+.env
+instance/
+data/
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.git/
+docs/
+scripts/
+测试方案.md
+路由说明.md

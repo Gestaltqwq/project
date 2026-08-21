@@ -1,0 +1,27 @@
+# ===== Web Framework =====
+flask>=3.0.3
+
+# ===== ORM =====
+SQLAlchemy>=2.0.30
+
+# ===== Validation / Settings =====
+pydantic>=2.7.1
+pydantic-settings>=2.2.1
+
+# ===== Auth =====
+python-jose[cryptography]>=3.3.0
+bcrypt>=4.1.2
+
+# ===== Data / ML =====
+# 注意：pandas/openpyxl 用 >= 下限，避免与 numpy 2.x 产生降级冲突
+pandas>=2.2.2
+openpyxl>=3.1.2
+numpy>=1.26
+scikit-learn
+xgboost
+joblib
+matplotlib
+seaborn
+
+# ===== LLM =====
+openai

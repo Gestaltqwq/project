@@ -1,0 +1,39 @@
+# CLUENER2020 -> alpaca 100条 LoRA 基础训练配置
+# 基础模型: Qwen2.5-1.5B-Instruct (本地 ModelScope 缓存, 全新适配器, 不复用之前 LoRA)
+model_name_or_path: C:\Users\LENOVO\.cache\modelscope\models\Qwen--Qwen2.5-1.5B-Instruct\snapshots\master
+flash_attn: disabled
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0
+lora_target: all
+
+dataset: cluener_alpaca_100
+dataset_dir: data
+template: qwen
+cutoff_len: 1024
+overwrite_cache: true
+preprocessing_num_workers: 1
+
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-4
+num_train_epochs: 30.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+max_grad_norm: 1.0
+bf16: true
+
+logging_steps: 5
+save_steps: 30
+eval_strategy: steps
+eval_steps: 30
+val_size: 0.05
+plot_loss: true
+report_to: none
+seed: 42
+
+output_dir: saves/Qwen2.5-1.5B-Instruct/lora/cluener_100_20260821
